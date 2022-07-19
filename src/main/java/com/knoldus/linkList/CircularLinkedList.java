@@ -1,0 +1,114 @@
+package com.knoldus.linkList;
+
+/**
+ * Class used to implement circular link list
+ * @param <E>
+ */
+public class CircularLinkedList<E> {
+    private static class Node<E> {
+
+        Node<E> next;
+        E value;
+
+        private Node(E value, Node<E> next) {
+            this.value = value;
+            this.next = next;
+        }
+    }
+
+    // For better O.O design this should be private allows for better black box design
+    private int size;
+    // this will point to dummy node;
+    private Node<E> head = null;
+    private Node<E> tail = null; // keeping a tail pointer to keep track of the end of list
+
+    // constructor for class. here we will make a dummy node for circular linked list implementation
+    // with reduced error catching as our list will never be empty;
+    public CircularLinkedList() {
+        // creation of the dummy node
+        head = new Node<E>(null, null);
+        tail = head;
+        size = 0;
+    }
+
+    // getter for the size... needed because size is private.
+    public int getSize() {
+        return size;
+    }
+
+    // for the sake of simplistic this class will only contain the append function or addLast other
+    // add functions can be implemented however this is the basses of them all really.
+    public void append(E value) {
+        if (value == null) {
+            // we do not want to add null elements to the list.
+            throw new NullPointerException("Cannot add null element to the list");
+        }
+        // head.next points to the last element;
+        if (tail == null) {
+            tail = new Node<E>(value, head);
+            head.next = tail;
+        } else {
+            tail.next = new Node<E>(value, head);
+            tail = tail.next;
+        }
+        size++;
+    }
+
+    // utility function for traversing the list
+    public String toString() {
+        Node p = head.next;
+        StringBuilder s = new StringBuilder("[ ");
+        while (p != head) {
+            s.append(p.value);
+            if (p != tail){
+                s.append(" , ");
+            }
+            p = p.next;
+        }
+        return s + " ]";
+    }
+
+    public void remove(int pos) {
+        if (pos > size || pos < 0) {
+            // catching errors
+            throw new IndexOutOfBoundsException("position cannot be greater than size or negative");
+        }
+        // we need to keep track of the element before the element we want to remove we can see why
+        // bellow.
+        Node<E> before = head;
+        for (int i = 1; i <= pos; i++) {
+            before = before.next;
+        }
+        Node<E> destroy = before.next;
+        E saved = destroy.value;
+        // assigning the next reference to the element following the element we want to remove...
+        // the last element will be assigned to the head.
+        before.next = before.next.next;
+        // scrubbing
+        if (destroy == tail) {
+            tail = before;
+        }
+        destroy = null;
+        size--;
+    }
+
+    public static void main(String[] args) {
+        CircularLinkedList<String> circularLinkedList = new CircularLinkedList<String>();
+
+        circularLinkedList.append(String.valueOf(24));
+        System.out.println(circularLinkedList);
+
+
+        circularLinkedList.append(String.valueOf(46));
+        System.out.println(circularLinkedList);
+
+        circularLinkedList.append(String.valueOf(68));
+        System.out.println(circularLinkedList);
+
+        circularLinkedList.append(String.valueOf(75));
+        System.out.println(circularLinkedList);
+
+        circularLinkedList.remove(3);
+        System.out.println(circularLinkedList);
+    }
+}
